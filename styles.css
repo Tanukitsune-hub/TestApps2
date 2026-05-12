@@ -1,0 +1,62 @@
+:root {
+  --bg: #0d1024;
+  --panel: #181c3b;
+  --text: #f7f8ff;
+  --accent: #89f7fe;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top, #1a1f4c, var(--bg));
+}
+
+header {
+  text-align: center;
+  padding: 1rem;
+}
+
+main {
+  width: min(1000px, 95vw);
+  margin: 0 auto 2rem;
+}
+
+.hud, .panel {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  background: rgba(24, 28, 59, 0.95);
+  border: 1px solid #2f3870;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.panel { flex-direction: column; }
+
+.tower-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button {
+  background: #2b3270;
+  color: var(--text);
+  border: 1px solid #4a57a8;
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+button.selected { outline: 2px solid var(--accent); }
+
+#game {
+  width: 100%;
+  border: 2px solid #4a57a8;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #0a1230 0%, #131f43 100%);
+}
