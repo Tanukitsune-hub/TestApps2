@@ -1,32 +1,50 @@
-# Codex development workflow
+# Codex Repository Instructions
 
-This repository follows a staged, evidence-first development process.
+Policy baseline: 2026-08-06
 
-## Main-agent authority
+These rules govern Codex/local implementation agents. ChatGPT may finish GitHub-only work without invoking Codex. Route B means ChatGPT edits and Codex verifies/fixes; Route C means Codex implements.
 
-- The main agent retains responsibility for requirement interpretation, architecture, risk decisions, and final synthesis.
-- Do not outsource final acceptance or treat a subagent summary as proof by itself.
-- Preserve applicable repository instructions. More specific nested `AGENTS.md` files take precedence for their scope.
+## Authority and handoff
 
-## Delegation policy
+- Follow: latest explicit user instruction; the exact handoff at its referenced ref; closest nested `AGENTS.md`; this file; then other repository docs.
+- GitHub files carry the full ChatGPT–Codex instruction and report; chat is only a pointer unless GitHub is unavailable.
+- Every Route B/C task must read the named `docs/handoffs/<WORK-ID>-instruction.md`. It defines outcome, scope/non-goals, decisions, targets, checks, Git/PR requirements, and stop conditions.
+- If its path/ref is missing or inconsistent, do not rebuild requirements from old chat, stale handoffs, or unrelated branches. Report a BLOCKER.
+- Material scope/design changes require an updated handoff/ref. Do not edit the instruction unless asked.
 
-- Use `terra_explorer` before changes when the repository or task is unfamiliar, cross-file impact is likely, or evidence must be gathered.
-- Use `terra_executor` only after scope, affected files, constraints, and acceptance criteria are clear.
-- Use at most one write-capable agent for any overlapping file set. Do not run competing write agents on the same code path.
-- Use `terra_auditor` after implementation or when validating a completion report. The auditor must remain independent and read-only.
-- Wait for delegated agents to finish, then independently evaluate their evidence and conclusions in the main thread.
+## Efficient execution
 
-## Delivery standard
+- Start with handoff-named files; inspect only applicable rules, code, tests, diffs, and history.
+- Do not repeat repo-wide orientation, confirmed decisions, known summaries, or routine prose already supplied by ChatGPT.
+- Build the smallest coherent end-to-end outcome. Apply YAGNI; avoid speculative features, broad refactors, parallel systems, and premature abstractions.
+- Resolve routine reversible ambiguity with the simplest safe assumption and record it. Escalate only when outcome, authorization, safety, security, financial correctness, or reversibility changes materially.
+- Subagents are optional. Use them only for independent parallel work or focused high-risk verification; never use competing writers on overlapping files or duplicate review loops.
+- Prefer one run through implementation, checks, in-scope fixes, commit, push, PR update, and report.
 
-For change requests, follow this sequence unless the task is genuinely trivial:
+## Implementation and checks
 
-1. Inspect the relevant source, specifications, tests, and repository state.
-2. State the bounded implementation plan and success criteria.
-3. Make the smallest in-scope change.
-4. Run targeted tests and relevant regression checks.
-5. Run an independent evidence-based audit.
-6. Report changed files, commands and results, residual risks, and any unverified claims.
+- Implement the primary workflow first; add only essential safety/usability. Investigation is not completion unless requested.
+- Normal checks: relevant lint/type/syntax, focused tests for changed logic, one happy path, and a runnable smoke test.
+- Strengthen checks for destructive work, auth/secrets, migrations, deployment, external writes, security, and financial calculations.
+- After fixes, rerun affected checks/smoke only. Never conceal failures or claim unrun checks.
+- BLOCKER means primary use fails, material data/security/financial risk remains, required authorization is missing, or safe continuation is impossible. Defer lesser gaps without stopping delivery.
 
-Separate verified facts, reasonable inferences, and unknowns. Do not claim completion when required validation did not run or repository evidence does not support the claim.
+## Git and safety
 
-Do not push, merge, release, delete data, rotate secrets, or expand scope unless the user explicitly requests that external action.
+- Check status, branch, remote, and diff; preserve unrelated work and history. Use the handoff branch or a task branch; stage only in-scope files.
+- Do not force-push, rewrite history, merge, release, deploy, delete data, rotate secrets, or operate external systems unless explicitly authorized in the handoff.
+- Never commit secrets, credentials, personal/private production data, or machine-specific paths.
+- Use repository-specific CI proportionately; do not copy tooling mechanically from another repo.
+
+## Report and completion
+
+- Write the complete result to `docs/handoffs/<WORK-ID>-report.md`; commit/push it with the work and link instruction/report in the PR.
+- Report: outcome; changed files; material decisions/assumptions; tests/CI; trial steps; limitations/deferred; simplifications; branch/commit/PR; work time; actual token usage if observable, otherwise `unavailable`; BLOCKER status.
+- Chat reply only: Work ID, report path, commit, branch, PR, BLOCKER status. Do not duplicate the report.
+- Done when primary use works end to end, critical checks pass, no BLOCKER remains, material risks/recovery are recorded, and GitHub is updated. Check consistency once, then stop.
+
+## Repository-specific rules: Market Desk
+
+- This is a static GitHub Pages dashboard. Preserve direct static hosting and relative asset paths.
+- Do not add a server, framework, package manager, or external runtime unless the handoff establishes a current need.
+- For UI changes, verify the page loads, core navigation/content remains usable, and browser-console errors are not introduced where a browser check is available.
