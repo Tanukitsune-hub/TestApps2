@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Power Balance Lab | 発電 × データセンター 電力需給シミュレーター</title>
+<style>
+:root{
+ --ink:#172932;--muted:#697a81;--soft:#91a0a3;--bg:#f4f5f1;--surface:#fff;--surface2:#f8faf8;
+ --line:#e1e8e5;--teal:#157a72;--darkteal:#0c5552;--orange:#d39638;--red:#d66e51;--shadow:0 10px 35px rgba(23,43,49,.042);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI",Meiryo,system-ui,sans-serif;font-size:14px;line-height:1.55;font-feature-settings:"tnum" 1}
+button,input{font:inherit}button{cursor:pointer}a{color:#116c70}a:hover{text-decoration:none}
+.app-shell{max-width:1780px;margin:0 auto;padding:24px 32px 52px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 0 22px;border-bottom:1px solid #dae2de}
+.brand{display:flex;gap:16px;align-items:center}.brandmark{width:49px;height:49px;border-radius:15px;background:var(--ink);color:#e5d6b2;display:grid;place-items:center;position:relative;overflow:hidden}
+.brandmark svg{width:30px;height:30px}.brandname{font-size:21px;font-weight:800;letter-spacing:-.05em;line-height:1.15}.brandname small{display:block;font-size:10px;letter-spacing:.17em;font-weight:700;color:#8b989c;margin-bottom:7px}
+.topactions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.btn{padding:10px 14px;background:#fff;border:1px solid #d7e2df;border-radius:10px;color:#26383f;font-weight:700;font-size:12px;transition:.2s}.btn:hover{border-color:#659f9a;background:#f3faf8}.btn.primary{background:var(--ink);color:white;border-color:var(--ink)}.btn.primary:hover{background:#2b474c}.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3eae88;margin-right:6px}
+.intro{display:flex;justify-content:space-between;align-items:end;gap:24px;padding:27px 0 22px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.16em;color:var(--teal);text-transform:uppercase;margin:0 0 5px}.intro h1{font-size:29px;margin:0;letter-spacing:-.065em;font-weight:800;line-height:1.38}.intro p{color:var(--muted);margin:8px 0 0;font-size:13px}.intro-side{text-align:right;color:#7b898c;max-width:300px;font-size:11px}
+.layout{display:grid;grid-template-columns:minmax(350px,390px) minmax(0,1fr);gap:19px;align-items:start}.sidebar{display:grid;gap:16px}.mainarea{min-width:0;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.sidecard{padding:21px 20px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 17px}.section-head h2{font-size:15px;letter-spacing:-.035em;margin:0;font-weight:800}.section-head .kicker{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#92a0a1;font-weight:800}
+.range-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:10px}.label{font-size:12px;font-weight:700;color:#53666a}.large-value{display:flex;align-items:baseline;gap:5px}.large-value strong{font-size:22px;letter-spacing:-.05em}.unit{color:#7a898d;font-weight:600;font-size:12px}
+input[type=number]{border:1px solid #d7e1de;border-radius:8px;padding:7px 9px;background:#fff;color:#1d3038;min-width:0;font-weight:750;font-variant-numeric:tabular-nums}.input-cap{width:84px;text-align:right;font-size:18px}.input-small{width:65px;text-align:right;font-size:12px;padding:6px 7px!important}
+input[type=number]:focus-visible,input[type=range]:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #a7d7cd;outline-offset:2px}
+input[type=range]{width:100%;height:5px;background:#e5ece9;accent-color:#157a72;cursor:pointer;margin:9px 0}.slider-labels{display:flex;justify-content:space-between;color:#9aaaaa;font-size:10px;margin-top:-5px}.form-block{padding:14px 0;border-top:1px solid #eff2ef}.form-block:first-of-type{border-top:0;padding-top:0}.form-block.compact{padding-bottom:0}
+.segmented{display:flex;padding:3px;border-radius:9px;background:#f0f3f2;gap:3px}.segmented button{border:0;border-radius:7px;background:transparent;color:#6f7d7f;padding:7px 12px;font-size:11px;font-weight:800;flex:1}.segmented button.active{background:#fff;color:#1b5f5d;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.minihelp{font-size:11px;color:#7e9090;margin-top:7px}.microfield{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:11px}.microfield label{color:#5d6e70;font-size:11px;font-weight:700}.microfield .inputwrap{display:flex;align-items:center;gap:5px;color:#879496;font-size:11px}.presets{display:flex;gap:6px;margin:8px 0 0}.preset{padding:5px 9px;font-size:11px;border-radius:7px;border:1px solid #e0e8e5;background:#fff;color:#7b898b;font-weight:700}.preset.active{background:#e6f1ee;color:#18796e;border-color:#b8d8d0}
+.genlist{display:grid;gap:7px}.gen-item{border:1px solid #e5ebe8;border-radius:11px;padding:12px 12px 10px;background:#fdfefd}.gen-row-top{display:flex;gap:7px;align-items:center}.source-mark{height:9px;width:9px;border-radius:3px;flex:none}.gen-icon{font-size:17px;width:23px;flex:none;text-align:center}.gen-label{font-weight:800;font-size:12px;flex:1;min-width:0}.gen-meta{font-size:10px;color:#8b9998;display:block;font-weight:500}.gen-inputs{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px}.gen-inputs label{font-size:10px;color:#80908f;font-weight:700;display:flex;gap:5px;align-items:center}.gen-inputs .number-unit{color:#879594;font-size:10px}.gen-inputs input{max-width:76px}.gen-inputs .mw-input{width:70px}.gen-item input[type=range]{margin:9px 0 4px;accent-color:var(--accent)}.gen-land{margin-top:7px;border-top:1px dashed #e7eeeb;padding-top:5px}.gen-land summary{font-size:10px;color:#7d8d8d;cursor:pointer;user-select:none}.land-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:9px 0 5px}.land-input-grid label{font-size:10px;color:#748585;display:flex;align-items:center;gap:5px;justify-content:space-between}.land-input-grid input{width:59px;font-size:11px}.land-input-grid .one-col{grid-column:span 2}.land-note{font-size:10px;color:#8b9c9b;margin-top:5px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{padding:17px 18px 16px;min-height:139px;position:relative;overflow:hidden}.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}.kpi-label{color:#6b7e81;font-size:11px;font-weight:750;margin:0}.kpi-number{font-size:29px;line-height:1.3;letter-spacing:-.065em;font-weight:850;margin:12px 0 4px;white-space:nowrap}.kpi-number small{font-size:12px;font-weight:700;color:#77858a;letter-spacing:0;margin-left:5px}.kpi-description{font-size:10px;color:#92a1a1;line-height:1.4}
+.panel{padding:22px 25px}.panel-header{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:18px}.panel-title{font-size:17px;letter-spacing:-.04em;margin:0;font-weight:830}.panel-sub{color:#819091;font-size:11px;margin-top:3px}.tag{display:inline-flex;align-items:center;border-radius:6px;background:#f3f6f3;border:1px solid #e4ebe7;color:#708281;font-weight:800;font-size:10px;padding:5px 8px;white-space:nowrap}
+.annual-bars{display:grid;gap:17px}.bar-labels{display:flex;justify-content:space-between;gap:9px;align-items:baseline;margin-bottom:7px;font-size:11px;font-weight:750}.bar-labels .total{font-size:15px;font-weight:850;letter-spacing:-.04em}.bigbar{height:27px;background:#edf2ee;border-radius:6px;overflow:hidden;display:flex;position:relative}.barseg{height:100%;min-width:0;transition:width .25s}.demandfill{height:100%;background:#2b4956;transition:width .25s}.legend{display:flex;gap:13px;flex-wrap:wrap;margin:14px 0 0}.legend span{display:inline-flex;gap:6px;align-items:center;font-size:10px;color:#65787b}.legend i{height:8px;width:8px;border-radius:2px;display:inline-block}.annual-foot{padding-top:14px;border-top:1px solid #ebeeeb;margin-top:17px;display:flex;gap:15px;align-items:center;justify-content:space-between}.annual-foot p{font-size:11px;color:#7e8e90;margin:0}.annual-foot strong{font-size:18px;letter-spacing:-.04em}
+.day-grid{display:grid;grid-template-columns:minmax(0,1fr) 212px;gap:24px;align-items:center}.hour-chart{width:100%;min-width:0;display:block;overflow:visible}.hour-side{background:#f7f9f7;border:1px solid #edf1ed;border-radius:12px;padding:17px}.hour-chip{font-size:11px;letter-spacing:.1em;color:#71898b;font-weight:800}.hour-main{font-size:27px;letter-spacing:-.06em;font-weight:850;margin:5px 0 4px}.hour-main span{font-size:12px;color:#859493;margin-left:4px}.hour-side .hour-item{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 0;border-bottom:1px solid #e6ece8;font-size:11px;color:#6a7c7e}.hour-side .hour-item strong{font-size:12px;color:#24383c}.hour-state{margin-top:11px;padding:8px 9px;border-radius:7px;font-weight:800;font-size:11px;background:#e7f4ed;color:#287860}.hour-state.negative{background:#fff0e9;color:#c45e3f}.hour-control{display:flex;gap:12px;align-items:center;margin-top:12px}.hour-control label{white-space:nowrap;color:#7f9092;font-size:11px}
+.tiny-note{font-size:10px;line-height:1.7;color:#90a0a0;margin:13px 0 0}.compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.compare-table{width:100%;border-collapse:collapse}.compare-table th{color:#819196;font-size:10px;font-weight:800;text-align:right;padding:10px 9px;border-bottom:1px solid #e5eae7;white-space:nowrap}.compare-table th:first-child{text-align:left;padding-left:0}.compare-table td{border-bottom:1px solid #edf0ed;padding:12px 9px;font-size:12px;text-align:right;vertical-align:middle;font-variant-numeric:tabular-nums}.compare-table td:first-child{text-align:left;padding-left:0}.compare-table tr:last-child td{border-bottom:0}.comparison-name{display:flex;align-items:center;gap:8px;font-weight:800;white-space:nowrap}.small-color{width:9px;height:9px;border-radius:2px;flex:none}.hbar-cell{min-width:105px}.track{background:#eff3f1;width:100%;height:7px;border-radius:10px;overflow:hidden;margin-top:6px}.track div{height:100%;border-radius:10px}.none{color:#a7b2b1;font-size:10px}.footline{padding:15px;border-radius:10px;background:#f7f9f5;margin-top:14px;color:#7c8d90;font-size:11px;line-height:1.7}.dome{display:inline-flex;align-items:center;gap:4px;color:#688f84;font-size:11px;font-weight:750}.dome:before{content:"▤";font-size:14px}
+.sources-card{padding:20px 25px}.sources-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}.source-row{font-size:11px;color:#718185;padding:8px 0;border-bottom:1px solid #eef2ef}.source-row a{display:block;font-size:11px;font-weight:800;margin-bottom:2px;text-decoration:none}.source-row a:hover{text-decoration:underline}.bottom{display:flex;align-items:center;justify-content:space-between;margin-top:22px;color:#98a5a5;font-size:10px;gap:10px}.export-banner{font-size:11px;color:#6a807e;background:#eaf1ec;padding:9px 12px;border-radius:9px;display:none}.export-banner.show{display:block}
+@media(max-width:1300px){.app-shell{padding:20px 18px}.layout{grid-template-columns:335px minmax(0,1fr)}.kpi{padding:15px 12px}.kpi-number{font-size:24px}.day-grid{grid-template-columns:1fr 175px;gap:14px}}
+@media(max-width:1000px){.layout{grid-template-columns:minmax(0,1fr)}.sidebar{grid-template-columns:1fr 1fr;align-items:start}.day-grid{grid-template-columns:minmax(0,1fr) 190px}.genlist{max-height:550px;overflow-y:auto}.app-shell{padding:15px 16px}}
+@media(max-width:700px){.app-shell{padding:12px 12px 25px}.topbar{align-items:start;flex-direction:column;gap:12px}.topactions{width:100%}.topactions .btn{flex:1}.intro{padding-top:23px}.intro h1{font-size:23px}.intro-side{display:none}.sidebar{grid-template-columns:1fr}.genlist{max-height:none}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.kpi{min-height:125px;padding:15px}.kpi-number{font-size:24px}.panel{padding:17px 14px}.day-grid{grid-template-columns:1fr}.hour-side{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px}.hour-chip{grid-column:span 3}.hour-main{font-size:24px;grid-column:span 3;margin:0}.hour-side .hour-item{display:block}.hour-state{grid-column:span 3}.compare-table th,.compare-table td{padding:9px 4px;font-size:11px}.compare-table th:nth-child(4),.compare-table td:nth-child(4){display:none}.hbar-cell{min-width:55px}.sources-grid{grid-template-columns:1fr}.annual-foot{align-items:start;flex-direction:column;gap:5px}.legend{gap:8px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition-duration:0s!important;scroll-behavior:auto!important}}
+@media print{body{background:#fff}.app-shell{max-width:none;padding:8px}.topactions,.presets,.hour-control,.gen-land{display:none}.card{box-shadow:none;break-inside:avoid}.sidebar{display:none}.layout{display:block}.mainarea{display:block}.mainarea>*{margin-bottom:12px}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+ <header class="topbar">
+  <div class="brand"><div class="brandmark"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M4 29 L13 12 L21 25 L27 8 L36 29" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 34H35" stroke="currentColor" stroke-width="2" opacity=".6"/></svg></div><div class="brandname"><small>POWER INTELLIGENCE / SIMULATION 01</small>Power Balance Lab</div></div>
+  <div class="topactions"><span style="font-size:11px;color:#718683;font-weight:700;margin-right:7px"><span class="status-dot"></span>OFFLINE READY</span><button class="btn" id="resetBtn" type="button">↺ 初期値に戻す</button><button class="btn" id="jsonBtn" type="button">設定を保存</button><button class="btn primary" id="csvBtn" type="button">↓ CSV出力</button></div>
+ </header>
+ <div class="intro"><div><p class="eyebrow">Energy generation × data center load</p><h1>発電と電力消費を、ひとつの画面で比較する。</h1><p>容量（MW）から年間電力量（GWh）へ。一般家庭の消費電力量と、発電設備の必要敷地面積まで直感的に。</p></div><div class="intro-side">2026 / NOV • Phase 1<br>単一HTML・完全オフライン・外部ライブラリ不要</div></div>
+ <div class="layout">
+  <aside class="sidebar">
+   <section class="card sidecard" aria-labelledby="dc-title">
+    <div class="section-head"><h2 id="dc-title">01 &nbsp;データセンター需要</h2><span class="kicker">Demand</span></div>
+    <div class="form-block"><div class="label" style="margin-bottom:9px">容量の定義</div><div class="segmented" role="group" aria-label="データセンター容量の定義"><button type="button" class="active" data-mode="facility">受電容量（施設全体）</button><button type="button" data-mode="it">IT設備容量</button></div><p id="modeHelp" class="minihelp">受電容量ベースではPUEを重ねて掛けません。</p></div>
+    <div class="form-block"><div class="range-head"><label class="label" for="dcMW">データセンター容量</label><div class="large-value"><input id="dcMW" class="input-cap" type="number" min="0" max="100000" step="10" value="100" aria-label="DC容量MW"><span class="unit">MW</span></div></div><input id="dcRange" type="range" min="0" max="1000" step="10" value="100" aria-label="データセンター容量スライダー"><div class="slider-labels"><span>0MW</span><span>1,000MW</span></div><div class="presets" aria-label="容量プリセット"><button type="button" data-dcpreset="100" class="preset active">100MW</button><button type="button" data-dcpreset="300" class="preset">300MW</button><button type="button" data-dcpreset="1000" class="preset">1GW</button></div></div>
+    <div class="form-block compact"><div class="range-head"><label class="label" for="dcLoad">平均負荷率</label><div class="large-value"><strong id="dcLoadLabel">75</strong><span class="unit">%</span></div></div><input id="dcLoad" type="range" min="0" max="100" step="1" value="75"><div class="slider-labels"><span>0%</span><span>100%</span></div><div class="microfield" id="pueLine" style="display:none"><label for="pue">PUE（IT設備→施設全体）</label><span class="inputwrap"><input id="pue" class="input-small" type="number" min="1" max="4" step="0.05" value="1.20">倍</span></div><div class="microfield"><label for="household">1世帯の年間電力消費量</label><span class="inputwrap"><input id="household" style="width:93px" class="input-small" type="number" min="1" max="1000000" step="100" value="3911">kWh</span></div><p class="minihelp">世帯換算の初期値：日本全国平均（2023年度、環境省）</p></div>
+   </section>
+   <section class="card sidecard" aria-labelledby="gen-title">
+    <div class="section-head"><h2 id="gen-title">02 &nbsp;発電設備を組み合わせる</h2><span class="kicker">Supply</span></div>
+    <p class="minihelp" style="margin:-8px 0 14px">設備容量と設備利用率を変更すると、年間発電量・24時間グラフ・面積が連動します。係数も個別に編集できます。</p>
+    <div id="generatorControls" class="genlist"></div>
+    <p class="tiny-note">太陽光の設備容量はMWac、その他は発電出力MWとして扱います。設備利用率の初期値は米国2025年実績（洋上風力は仮定値）。</p>
+   </section>
+  </aside>
+  <div class="mainarea">
+   <section class="kpis" aria-label="サマリー">
+    <div class="card kpi" style="--accent:#2b4956"><p class="kpi-label">DCの年間消費電力量</p><div class="kpi-number"><span id="kpiDemand">657</span><small>GWh</small></div><div class="kpi-description" id="kpiDemandDetail">年間8,760時間・平均75MW</div></div>
+    <div class="card kpi" style="--accent:#1b9985"><p class="kpi-label">発電設備の年間発電量</p><div class="kpi-number"><span id="kpiGeneration">806</span><small>GWh</small></div><div class="kpi-description" id="kpiRatio">DC需要に対して123%相当</div></div>
+    <div class="card kpi" style="--accent:#d39638"><p class="kpi-label">DCの家庭電力量換算</p><div class="kpi-number"><span id="kpiHouseholds">16.8万</span><small>世帯分</small></div><div class="kpi-description">日本の平均世帯・年間消費量との比較</div></div>
+    <div class="card kpi" style="--accent:#7f869b"><p class="kpi-label" id="landKpiLabel">発電設備の事業区域・敷地</p><div class="kpi-number"><span id="kpiLand">38.1</span><small>km²</small></div><div class="kpi-description" id="kpiLandDetail">東京ドーム約814個分</div></div>
+   </section>
+   <section class="card panel" aria-labelledby="annual-title">
+    <div class="panel-header"><div><h2 id="annual-title" class="panel-title">年間電力バランス</h2><div class="panel-sub">設備容量 × 設備利用率 × 8,760時間。発電源別の構成も表示。</div></div><span id="balanceTag" class="tag">年間収支</span></div>
+    <div class="annual-bars">
+     <div><div class="bar-labels"><span>供給側｜発電量の合計</span><span class="total" id="annualGenLabel">806 GWh</span></div><div id="supplyBar" class="bigbar" aria-label="電源別の年間発電量"></div></div>
+     <div><div class="bar-labels"><span>需要側｜データセンター</span><span class="total" id="annualDemandLabel">657 GWh</span></div><div class="bigbar"><div class="demandfill" id="demandBar"></div></div></div>
+    </div>
+    <div class="legend" id="annualLegend"></div>
+    <div class="annual-foot"><p>年間電力量が足りても、夜間や風の弱い時間帯の供給不足は別途発生し得ます。</p><div style="text-align:right;white-space:nowrap"><span id="annualBalanceText" style="display:block;font-size:10px;color:#7c9090">余剰電力量</span><strong id="annualBalance">+149 GWh</strong></div></div>
+   </section>
+   <section class="card panel" aria-labelledby="hour-title">
+    <div class="panel-header"><div><h2 id="hour-title" class="panel-title">24時間の電力需給</h2><div class="panel-sub">ある1日を模した発電プロファイル。棒が供給、横線がDC需要です。</div></div><span class="tag">模式シミュレーション</span></div>
+    <div class="day-grid"><div><svg id="hourChart" class="hour-chart" viewBox="0 0 760 275" role="img" aria-label="24時間の積み上げ発電量とデータセンター消費電力の比較"></svg><div class="hour-control"><label for="hourRange">時刻を選択</label><input type="range" id="hourRange" min="0" max="23" step="1" value="14"><span id="hourRangeText" style="font-size:11px;color:#5e7377;font-weight:800;white-space:nowrap">14:00</span></div></div>
+     <div class="hour-side"><div class="hour-chip" id="hourChip">14:00 の電力需給</div><div class="hour-main" id="hourSupply">--<span>MW 供給</span></div><div class="hour-item"><span>DC需要</span><strong id="hourDemand">75 MW</strong></div><div class="hour-item"><span>供給 − 需要</span><strong id="hourDelta">-- MW</strong></div><div class="hour-item"><span>太陽光の出力</span><strong id="hourSolar">-- MW</strong></div><div id="hourState" class="hour-state">計算中</div></div></div>
+    <p class="tiny-note">このグラフは米国の実測時系列ではありません。太陽光を日中に集中させ、風力の出力を変化させた模式日であり、蓄電池・送電制約・損失・季節変化・発電設備の実際の運転計画は考慮していません。年間充足と24時間安定供給を区別するための参考表示です。</p>
+   </section>
+   <section class="card panel" aria-labelledby="compare-title">
+    <div class="panel-header"><div><h2 id="compare-title" class="panel-title">DC需要を単一電源で賄うなら？</h2><div class="panel-sub">DCの年間消費量と同じだけ発電するための設備容量・用地を比較。</div></div></div>
+    <div class="compare-head" style="margin-bottom:12px"><div style="font-size:11px;color:#75898a">比較する面積の定義</div><div class="segmented" role="group" aria-label="比較する敷地面積"><button class="active" type="button" data-land-mode="total">事業区域・敷地</button><button type="button" data-land-mode="direct">直接占有・改変</button></div></div>
+    <div style="overflow-x:auto"><table class="compare-table"><thead><tr><th>発電方式</th><th>必要設備容量</th><th>必要面積</th><th>東京ドーム換算</th><th style="text-align:left;padding-left:12px">面積の大きさ（相対）</th></tr></thead><tbody id="compareBody"></tbody></table></div>
+    <div class="footline"><b>面積の見方：</b> 風力の「事業区域」には風車間の農地・森林等が含まれ、必ずしも全域を舗装・改変するわけではありません。洋上風力は海域、水力は貯水池等の範囲により値が大きく変わるため、初期の面積係数を設定していません。係数は左側の「面積係数を編集」から変更できます。<br><b>重要：</b> ここでの「賄う」は年間の発電電力量が等しいという意味で、24時間供給・同一地域への送電・系統接続を保証するものではありません。</div>
+   </section>
+   <section class="card sources-card" aria-labelledby="source-title"><div class="section-head"><h2 id="source-title">前提・データソース</h2><span class="kicker">Sources / Methodology</span></div>
+    <div class="sources-grid">
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://www.eia.gov/electricity/annual/table.php?t=epa_04_08_b.html">EIA｜2025年 非化石電源の設備利用率 ↗</a>太陽光24.0%・風力33.8%・水力34.4%・原子力91.1%・地熱65.9%。洋上風力45%はシナリオ仮定。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://www.eia.gov/electricity/annual/table.php?t=epa_04_08_a.html">EIA｜2025年 化石電源の設備利用率 ↗</a>天然ガス複合サイクル58.7%。電源別初期値は全国の発電実績であり、特定施設の予測値ではありません。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://www.env.go.jp/earth/ondanka/kateico2tokei/energy/detail/01/">環境省｜令和5年度 家庭部門CO₂排出実態統計 ↗</a>家庭の電力消費量：3,911kWh/世帯・年。地域・年・家族構成による違いは入力で変更可能。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://docs.nrel.gov/docs/fy13osti/56290.pdf">NREL｜太陽光発電の土地利用（2013） ↗</a>20MW超の固定式PV：総面積7.5ac/MWac（約3.04ha/MWac）、直接面積5.8ac/MWac（約2.35ha/MWac）。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://research-hub.nlr.gov/en/publications/land-use-requirements-of-modern-wind-power-plants-in-the-united-s/">NREL｜陸上風力発電の土地利用（2009） ↗</a>事業区域約34.5ha/MW、恒久的な直接改変面積約0.3ha/MW。定義の違いに注意。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://www.energy.gov/ne/articles/5-reasons-nuclear-good-neighbor">米国DOE｜原子力発電所の用地 ↗</a>約1.3平方マイル/1,000MW ≒ 0.337ha/MW。発電所敷地のみの概数。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://robertsonsite.ca/project-profiles/combined-cycle-power-plant">Napaneeガス火力｜参考案件 ↗</a>900MW・93エーカーの施設事例から約0.042ha/MWを算出。代表値でなく個別事例の参考値。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://www.ifc.org/content/dam/ifc/doc/2000/2007-geothermal-power-generation-ehs-guidelines-en.pdf">IFC｜地熱発電所の用地 ↗</a>0.5〜3.5ha/MWとされる範囲の中間値2.0ha/MWを仮置き。</div>
+     <div class="source-row"><a target="_blank" rel="noopener noreferrer" href="https://www.tokyo-dome.co.jp/faq/facility/dome/">東京ドーム｜公式面積 ↗</a>東京ドームの建築面積46,755㎡＝4.6755ha。面積換算用。</div>
+     <div class="source-row"><b style="display:block;margin-bottom:2px">計算上の仕様</b>1年=8,760時間（平年）。世帯換算は年間電力量比較。土地面積は送電線・燃料供給網・鉱山・ライフサイクル全体の土地利用を含みません。</div>
+    </div>
+   </section>
+  </div>
+ </div>
+ <div class="bottom"><div>POWER BALANCE LAB &nbsp; / &nbsp; PHASE 01 &nbsp; / &nbsp; 個別施設の投資判断に使う場合は立地・契約・実測を優先</div><div>2026.11.13</div></div>
+</div>
+<script>
+(()=>{
+ 'use strict';
+ const HRS=8760, DOME_HA=4.6755;
+ const defaults={dcMW:100,load:75,mode:'facility',pue:1.2,household:3911,landMode:'total',hour:14,generators:[
+  {id:'solar',name:'太陽光（地上固定式）',icon:'☀️',color:'#dda446',capacity:120,cf:24,maxCF:48,landTotal:3.04,landDirect:2.35,note:'NREL（20MW超・固定式PV）の米国実績。容量はMWac。'},
+  {id:'wind',name:'陸上風力',icon:'🌬️',color:'#4b9d97',capacity:100,cf:33.8,maxCF:100,landTotal:34.5,landDirect:0.3,note:'NRELの総事業区域と恒久的直接改変。定義が大きく異なります。'},
+  {id:'offshore',name:'洋上風力',icon:'🌊',color:'#70b6c1',capacity:0,cf:45,maxCF:100,landTotal:null,landDirect:null,note:'面積は海域・基礎の定義が異なり、未設定。45%は仮定。'},
+  {id:'gas',name:'ガス火力（複合サイクル）',icon:'🔥',color:'#d9785c',capacity:50,cf:58.7,maxCF:100,landTotal:0.042,landDirect:0.042,note:'Napanee発電所（900MW、93ac）の個別施設例。一般的な標準値ではありません。'},
+  {id:'nuclear',name:'原子力',icon:'⚛️',color:'#8269a9',capacity:0,cf:91.1,maxCF:100,landTotal:0.337,landDirect:0.337,note:'DOEの1,000MW当たり1.3平方マイルを設備容量で割戻し。'},
+  {id:'hydro',name:'水力',icon:'💧',color:'#517eab',capacity:0,cf:34.4,maxCF:100,landTotal:null,landDirect:null,note:'ダム・貯水池の定義と地形に依存するため、面積は未設定。'},
+  {id:'geothermal',name:'地熱',icon:'♨️',color:'#a07c66',capacity:0,cf:65.9,maxCF:100,landTotal:2.0,landDirect:2.0,note:'IFCの0.5～3.5ha/MWの中間値。敷地内の区分は仮置き。'}
+ ]};
+ let state=JSON.parse(JSON.stringify(defaults));
+ const el=id=>document.getElementById(id);
+ const safeNum=(x,lo=0,hi=1e8)=>Math.min(hi,Math.max(lo,Number.isFinite(+x)?+x:lo));
+ const format=(n,d=0)=>new Intl.NumberFormat('ja-JP',{maximumFractionDigits:d,minimumFractionDigits:0}).format(n);
+ const nShort=n=>n>=100000000?format(n/100000000,1)+'億':n>=10000?format(n/10000,1)+'万':format(n);
+ const htmlEsc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+ function generatorList(){
+  el('generatorControls').innerHTML=state.generators.map(g=>`<div class="gen-item" style="--accent:${g.color}">
+   <div class="gen-row-top"><span class="gen-icon">${g.icon}</span><span class="source-mark" style="background:${g.color}"></span><span class="gen-label">${g.name}<span class="gen-meta" id="out-${g.id}">${format(g.capacity*g.cf*.0876,1)} GWh / 年</span></span></div>
+   <div class="gen-inputs"><label>設備容量 <input class="mw-input input-small" type="number" data-gen="${g.id}" data-field="capacity" min="0" max="100000" step="10" value="${g.capacity}" aria-label="${g.name}の設備容量"> <span class="number-unit">MW</span></label><label>設備利用率 <input class="input-small" data-gen="${g.id}" data-field="cf" type="number" min="0" max="${g.maxCF}" step="0.1" value="${g.cf}" aria-label="${g.name}の設備利用率"><span class="number-unit">%</span></label></div>
+   <input type="range" data-gen="${g.id}" data-field="capacityRange" min="0" max="1000" step="10" value="${Math.min(1000,g.capacity)}" aria-label="${g.name}の設備容量スライダー">
+   <details class="gen-land"><summary>面積係数を編集 <span style="color:#a1afac">（ha / MW）</span></summary><div class="land-input-grid"><label>事業区域・敷地 <input type="number" data-gen="${g.id}" data-field="landTotal" min="0" max="100000" step="any" value="${g.landTotal??''}" placeholder="未設定" aria-label="${g.name}の事業区域敷地係数"></label><label>直接占有・改変 <input type="number" data-gen="${g.id}" data-field="landDirect" min="0" max="100000" step="any" value="${g.landDirect??''}" placeholder="未設定" aria-label="${g.name}の直接占有面積係数"></label></div><div class="land-note">${g.note}</div></details>
+  </div>`).join('');
+ }
+ function annual(g){return g.capacity*g.cf/100*HRS/1000}
+ function dcAverage(){return state.dcMW*state.load/100*(state.mode==='it'?state.pue:1)}
+ function dcAnnual(){return dcAverage()*HRS/1000}
+ function landIntensity(g){return state.landMode==='total'?g.landTotal:g.landDirect}
+ function sumLand(){let ha=0,missing=[];for(const g of state.generators){if(!g.capacity)continue;let density=landIntensity(g);if(density===null)missing.push(g.name);else ha+=density*g.capacity}return {ha,missing}}
+ function normalizedProfiles(g){const raw=Array.from({length:24},(_,h)=>{
+  const t=h+.5;
+  if(g.id==='solar')return t>=6&&t<18?Math.sin(Math.PI*(t-6)/12):0;
+  if(g.id==='wind')return Math.max(.1,.85+.23*Math.sin(t*Math.PI/12+1.3)+.15*Math.cos(t*Math.PI/6+.4));
+  if(g.id==='offshore')return Math.max(.1,.9+.15*Math.sin(t*Math.PI/12+1.5)+.08*Math.cos(t*Math.PI/6));
+  if(g.id==='hydro')return .7+.24*(1+Math.sin((t-13)*Math.PI/12));
+  return 1;
+ });
+  const cf=g.cf/100;let lo=0,hi=100;
+  for(let i=0;i<48;i++){const mid=(lo+hi)/2;let avg=raw.reduce((a,b)=>a+Math.min(1,b*mid),0)/24;if(avg<cf)lo=mid;else hi=mid}
+  return raw.map(v=>Math.min(1,v*(lo+hi)/2));
+ }
+ function computeHourly(){const values=Array.from({length:24},()=>({parts:[],total:0}));for(const g of state.generators){const profiles=normalizedProfiles(g);for(let h=0;h<24;h++){const mw=g.capacity*profiles[h];values[h].parts.push({id:g.id,name:g.name,color:g.color,mw});values[h].total+=mw}}return values}
+ function updateMode(){document.querySelectorAll('[data-mode]').forEach(btn=>btn.classList.toggle('active',btn.dataset.mode===state.mode));el('pueLine').style.display=state.mode==='it'?'flex':'none';el('modeHelp').textContent=state.mode==='it'?'IT容量×平均負荷率×PUEで施設全体の消費電力を推計します。':'受電容量ベースではPUEを重ねて掛けません。'}
+ function updateInputs(){el('dcMW').value=state.dcMW;el('dcRange').value=Math.min(1000,state.dcMW);el('dcLoad').value=state.load;el('dcLoadLabel').textContent=format(state.load);el('pue').value=state.pue;el('household').value=state.household;el('hourRange').value=state.hour;el('hourRangeText').textContent=String(state.hour).padStart(2,'0')+':00';document.querySelectorAll('[data-dcpreset]').forEach(b=>b.classList.toggle('active',+b.dataset.dcpreset===state.dcMW));document.querySelectorAll('[data-land-mode]').forEach(b=>b.classList.toggle('active',b.dataset.landMode===state.landMode));updateMode()}
+ function updateSummary(){const demand=dcAnnual(),gen=state.generators.reduce((a,g)=>a+annual(g),0),delta=gen-demand,households=demand*1e6/state.household,land=sumLand();
+  el('kpiDemand').textContent=format(demand,1);el('kpiDemandDetail').textContent='平均'+format(dcAverage(),1)+'MW × 8,760時間';el('kpiGeneration').textContent=format(gen,1);el('kpiRatio').textContent='DC需要の'+(demand?format(gen/demand*100,1)+'%':'—')+'相当';el('kpiHouseholds').textContent=nShort(households);el('kpiLand').textContent=format(land.ha/100,2);el('landKpiLabel').textContent=state.landMode==='total'?'発電設備の事業区域・敷地':'発電設備の直接占有・改変';el('kpiLandDetail').textContent='東京ドーム約'+format(land.ha/DOME_HA,1)+'個分'+(land.missing.length?'（一部未算定）':'');
+  const max=Math.max(1,gen,demand),scale=v=>Math.max(0,v)/max*100;
+  el('supplyBar').innerHTML=state.generators.filter(g=>annual(g)>0).map(g=>`<div class="barseg" title="${g.name}: ${format(annual(g),2)} GWh" style="width:${scale(annual(g))}%;background:${g.color}"></div>`).join('');el('demandBar').style.width=scale(demand)+'%';el('annualGenLabel').textContent=format(gen,1)+' GWh';el('annualDemandLabel').textContent=format(demand,1)+' GWh';el('annualLegend').innerHTML=state.generators.filter(g=>g.capacity>0).map(g=>`<span><i style="background:${g.color}"></i>${g.name} ${format(annual(g),1)} GWh</span>`).join('');
+  el('annualBalanceText').textContent=delta>=0?'年間余剰電力量':'年間不足電力量';el('annualBalance').textContent=(delta>=0?'+':'−')+format(Math.abs(delta),1)+' GWh';el('annualBalance').style.color=delta>=0?'#1f8771':'#be664c';el('balanceTag').textContent=delta>=0?'年間発電量：需要以上':'年間発電量：不足';
+  state.generators.forEach(g=>{const t=el('out-'+g.id);if(t)t.textContent=format(annual(g),1)+' GWh / 年'});
+ }
+ function hourChart(values){const svg=el('hourChart'),demand=dcAverage(),w=760,h=275,marginL=44,marginR=8,top=16,bottom=29,x0=marginL,y0=top,y1=h-bottom,plotW=w-marginL-marginR,plotH=y1-y0;
+  const maxV=Math.max(10,demand*1.12,...values.map(v=>v.total*1.08));const maxAxis=Math.ceil(maxV/20)*20;const sy=mw=>y1-mw/maxAxis*plotH;const bw=plotW/24;
+  let layers=[];for(let i=0;i<=4;i++){let val=maxAxis*i/4,y=sy(val);layers.push(`<line x1="${x0}" y1="${y}" x2="${w-marginR}" y2="${y}" stroke="#eaf0ec" stroke-width="1"/><text x="${x0-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#96a5a5">${format(val)}</text>`)}
+  values.forEach((value,hr)=>{let baseline=0;const x=x0+hr*bw+3,bWidth=Math.max(2,bw-6);value.parts.forEach(p=>{if(p.mw<0.001)return;const y=sy(baseline+p.mw),height=sy(baseline)-y;layers.push(`<rect x="${x}" y="${y}" width="${bWidth}" height="${Math.max(0,height)}" rx="1.5" fill="${p.color}" opacity=".9"/>`);baseline+=p.mw});if(hr===state.hour)layers.push(`<rect x="${x0+hr*bw}" y="${top}" width="${bw}" height="${plotH}" fill="#3b8d81" opacity=".09" pointer-events="none"/>`);layers.push(`<rect data-hour="${hr}" x="${x0+hr*bw}" y="${top}" width="${bw}" height="${plotH}" fill="transparent" style="cursor:crosshair"><title>${hr}:00 供給 ${format(value.total,1)}MW / 需要 ${format(demand,1)}MW</title></rect>`)});
+  const demandY=sy(demand);layers.push(`<line x1="${x0}" y1="${demandY}" x2="${w-marginR}" y2="${demandY}" stroke="#203948" stroke-width="2.4" stroke-dasharray="7 5"/><text x="${w-11}" y="${Math.max(12,demandY-7)}" text-anchor="end" font-size="11" fill="#233945" font-weight="700">DC ${format(demand,1)} MW</text>`);
+  for(let h=0;h<=24;h+=3){const x=x0+plotW*h/24;layers.push(`<text x="${x}" y="${y1+19}" text-anchor="middle" font-size="11" fill="#819493">${h===24?'24':h}:00</text>`)}
+  layers.push(`<text x="${x0-40}" y="${top-5}" font-size="10" fill="#8b9d9b">MW</text>`);svg.innerHTML=layers.join('');
+  const hour=values[state.hour],diff=hour.total-demand;el('hourChip').textContent=String(state.hour).padStart(2,'0')+':00 の電力需給';el('hourSupply').innerHTML=format(hour.total,1)+'<span>MW 供給</span>';el('hourDemand').textContent=format(demand,1)+' MW';el('hourDelta').textContent=(diff>=0?'+':'−')+format(Math.abs(diff),1)+' MW';el('hourDelta').style.color=diff>=0?'#258870':'#cf644d';el('hourSolar').textContent=format(hour.parts.find(p=>p.id==='solar').mw,1)+' MW';el('hourState').textContent=diff>=0?'この時間帯は供給量が需要以上':'この時間帯は系統・蓄電等からの補完が必要';el('hourState').classList.toggle('negative',diff<0);
+ }
+ function compare(){const demand=dcAnnual(),rows=state.generators.map(g=>{const needed=g.cf>0?demand/(8.76*g.cf/100):null;const density=landIntensity(g);return {...g,needed,land:needed===null||density===null?null:needed*density}});const maxLand=Math.max(1,...rows.filter(r=>r.land!==null).map(r=>r.land));
+ el('compareBody').innerHTML=rows.map(r=>`<tr><td><span class="comparison-name"><span class="small-color" style="background:${r.color}"></span>${r.name}</span></td><td>${r.needed===null?'—':format(r.needed,1)+' MW'}</td><td>${r.land===null?'<span class="none">未設定</span>':format(r.land,1)+' ha'}</td><td>${r.land===null?'<span class="none">—</span>':format(r.land/DOME_HA,1)+' 個分'}</td><td class="hbar-cell"><div class="track"><div style="width:${r.land!==null?r.land/maxLand*100:0}%;background:${r.color}"></div></div></td></tr>`).join('');
+ }
+ function refresh(){updateInputs();updateSummary();hourChart(computeHourly());compare()}
+ function setDcMW(n){state.dcMW=safeNum(n,0,100000);refresh()}
+ el('dcMW').addEventListener('input',e=>setDcMW(e.target.value));el('dcRange').addEventListener('input',e=>setDcMW(e.target.value));el('dcLoad').addEventListener('input',e=>{state.load=safeNum(e.target.value,0,100);refresh()});el('pue').addEventListener('input',e=>{state.pue=safeNum(e.target.value,1,4);refresh()});el('household').addEventListener('input',e=>{state.household=safeNum(e.target.value,1,1e6);refresh()});
+ document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{state.mode=b.dataset.mode;refresh()}));document.querySelectorAll('[data-dcpreset]').forEach(b=>b.addEventListener('click',()=>setDcMW(+b.dataset.dcpreset)));document.querySelectorAll('[data-land-mode]').forEach(b=>b.addEventListener('click',()=>{state.landMode=b.dataset.landMode;refresh()}));
+ el('generatorControls').addEventListener('input',e=>{const b=e.target,id=b.dataset.gen,field=b.dataset.field;if(!id||!field)return;const g=state.generators.find(g=>g.id===id);if(!g)return;
+  if(field==='capacity'||field==='capacityRange'){g.capacity=safeNum(b.value,0,100000);el('generatorControls').querySelectorAll(`[data-gen="${id}"][data-field="capacity"], [data-gen="${id}"][data-field="capacityRange"]`).forEach(n=>{if(n!==b)n.value=n.dataset.field==='capacityRange'?Math.min(g.capacity,1000):g.capacity})}
+  else if(field==='cf'){g.cf=safeNum(b.value,0,g.maxCF)}
+  else if(field==='landTotal'||field==='landDirect'){g[field]=b.value===''?null:safeNum(b.value,0,100000)}
+  updateSummary();hourChart(computeHourly());compare()});
+ el('hourRange').addEventListener('input',e=>{state.hour=+e.target.value;refresh()});el('hourChart').addEventListener('click',e=>{const t=e.target.closest('[data-hour]');if(!t)return;state.hour=+t.dataset.hour;refresh()});
+ el('resetBtn').addEventListener('click',()=>{state=JSON.parse(JSON.stringify(defaults));generatorList();refresh()});
+ function download(text,filename,mime){const blob=new Blob([text],{type:mime}),url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)}
+ el('jsonBtn').addEventListener('click',()=>download(JSON.stringify({tool:'Power Balance Lab',version:'1.0',exportedAt:new Date().toISOString(),...state},null,2),'power-balance-settings.json','application/json;charset=utf-8'));
+ el('csvBtn').addEventListener('click',()=>{const rows=[['種類','発電方式/項目','設備容量_MW','設備利用率_%','年間GWh','年間世帯換算','事業区域敷地_ha','直接占有改変_ha','参考ソース'],['需要','データセンター',state.dcMW,state.load,dcAnnual(),dcAnnual()*1e6/state.household,'','','DC容量タイプ: '+state.mode+' / PUE: '+state.pue],...state.generators.map(g=>['発電',g.name,g.capacity,g.cf,annual(g),annual(g)*1e6/state.household,g.landTotal===null?'':g.capacity*g.landTotal,g.landDirect===null?'':g.capacity*g.landDirect,g.note])];const lines=rows.map(r=>r.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(','));download('\ufeff'+lines.join('\r\n'),'power-balance-results.csv','text/csv;charset=utf-8')});
+ generatorList();refresh();
+})();
+</script>
+</body>
+</html>
