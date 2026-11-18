@@ -4,6 +4,12 @@ Policy baseline: 2026-08-11
 
 These rules govern Codex/local implementation agents. ChatGPT may finish GitHub-only work without invoking Codex. Route B means ChatGPT edits and Codex verifies/fixes; Route C means Codex implements.
 
+## Communication preference (user-facing)
+
+- Talk to me ELI5 by default and go deeper if I ask.
+- In Japanese conversations, use plain Japanese. Keep technical decisions, code, tests, material risks, evidence, and requested artifacts precise. Follow any explicit request for a different level of detail or tone.
+
+
 ## Authority and handoff
 
 - Follow: latest explicit user instruction; the exact handoff at its referenced ref; closest nested `AGENTS.md`; this file; then other repository docs.
