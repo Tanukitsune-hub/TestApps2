@@ -28,6 +28,8 @@ These rules govern Codex/local implementation agents. ChatGPT may finish GitHub-
 
 ## Efficient execution
 
+- If available in this Codex runtime, use the `hanyou` plugin by task: `impeccable` for existing operational UI, `design-taste-frontend` for new expressive websites, `modern-web-guidance` for relevant browser-side standards, `karpathy-guidelines` for code changes, `code-simplification` for justified scoped cleanup, `avoid-ai-writing` for English prose, and `japanese-writing-pipeline` for Japanese business/technical prose.
+- Select only relevant skills; let at most one design skill lead. Preserve existing product/design/data rules, finance and source accuracy, and repository instructions. ChatGPT installation does not prove availability in Codex Cloud or local; use existing project guidance if `hanyou` is unavailable. Do not automatically run duplicate audits or full refactors.
 - Start with handoff-named files; inspect only applicable rules, code, tests, diffs, and history.
 - Do not repeat repo-wide orientation, confirmed decisions, known summaries, or routine prose already supplied by ChatGPT.
 - Build the smallest coherent end-to-end outcome. Apply YAGNI; avoid speculative features, broad refactors, parallel systems, and premature abstractions.
